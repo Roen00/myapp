@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="myapp" default="help">
-
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="myapp" default="help">
     <!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
          Version Control Systems. -->
+
+    <target name="download-ivy" unless="skip.download">
+        <!-- download Ivy from web site so that it can be
+            used even without any special installation -->
+        <echo message="installing ivy..."/>
+        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+             dest="${ivy.jar.file}" usetimestamp="true"/>
+    </target>
+    <target name="install-ivy" depends="download-ivy"
+            description="--> install ivy">
+        <path id="ivy.lib.path">
+            <fileset dir="${lib.build.dir}" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                 uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+    <target name="update" depends="install-ivy"
+            description="Download project dependencies">
+        <!-- edited for brevity -->
+        <ivy:settings file="ivysettings.xml"/>
+        <ivy:retrieve type="jar" pattern="libs/[module]-[type]-[artifact]-[revision].[ext]"/>
+        <!-- edited for brevity -->
+    </target>
     <property file="local.properties"/>
 
     <!-- The ant.properties file can be created by you. It is only edited by the
